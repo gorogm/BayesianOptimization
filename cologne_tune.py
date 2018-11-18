@@ -30,18 +30,25 @@ def xgb_evaluate(reward_first_step_idle,
     file.write("silent=1" + "\r\n")
     file.close()
 
-    result = subprocess.run(['python3', '/opt/work/pommermanmunchen/playground/berlin_benchmark.py'], stdout=subprocess.PIPE)
-    print(result.stderr)
+    result = subprocess.run(['python3', '/opt/work/pommerman_cpp/playground/dortmund_vs_berlin.py'], stdout=subprocess.PIPE)
     #print(result.stdout)
-    with open('/tmp/hypertune_result.txt', 'r') as content_file:
-        winRatio = float(content_file.read())
+    if result.stderr is not None:
+        print(result.stderr)
+    #print(result.stdout)
+    try:
+        with open('/tmp/hypertune_result_kills.txt', 'r') as content_file:
+            winRatio = float(content_file.read())
+        os.remove('/tmp/hypertune_result_kills.txt')
+    except:
+        print("Crashed?")
+        winRatio = 0.0
 
     return winRatio
 
 if __name__ == '__main__':
 
-    num_iter = 10
-    init_points = 10
+    num_iter = 20
+    init_points = 20
 
     """
     float reward_first_step_idle = 0.001f;
@@ -51,11 +58,12 @@ if __name__ == '__main__':
     float reward_move_to_pickup = 1000.0f;
     """
 
-    xgbBO = BayesianOptimization(xgb_evaluate, {'reward_first_step_idle': (0.01, 0.0001),
+    xgbBO = BayesianOptimization(xgb_evaluate, {
+                                                'reward_first_step_idle': (0.01, 0.0001),
                                                 'reward_sooner_later_ratio': (0.90, 0.99),
-                                                'reward_collectedPowerup': (0.9, 0.1),
-                                                'reward_move_to_enemy': (50, 150),
-                                                'reward_move_to_pickup': (500, 1500),
+                                                'reward_collectedPowerup': (0.3, 0.6),
+                                                'reward_move_to_enemy': (80, 130),
+                                                'reward_move_to_pickup': (800, 1300),
                                                 })
 
     xgbBO.maximize(init_points=init_points, n_iter=num_iter)

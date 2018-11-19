@@ -12,7 +12,7 @@ from sklearn.metrics import mean_absolute_error
 from bayes_opt import BayesianOptimization
 from tqdm import tqdm
 import subprocess
-
+import os
 def xgb_evaluate(reward_first_step_idle,
                  reward_sooner_later_ratio,
                  reward_collectedPowerup,
@@ -36,19 +36,27 @@ def xgb_evaluate(reward_first_step_idle,
         print(result.stderr)
     #print(result.stdout)
     try:
-        with open('/tmp/hypertune_result_kills.txt', 'r') as content_file:
+        with open('/tmp/hypertune_result_killdeath_diff.txt', 'r') as content_file:
             winRatio = float(content_file.read())
-        os.remove('/tmp/hypertune_result_kills.txt')
+        os.remove('/tmp/hypertune_result_killdeath_diff.txt')
     except:
-        print("Crashed?")
-        winRatio = 0.0
+        print("Crashed? retry..")
+        try:
+            print(result.stdout[-100:])
+        except:
+            pass
+        winRatio = xgb_evaluate(reward_first_step_idle,
+                                reward_sooner_later_ratio,
+                                reward_collectedPowerup,
+                                reward_move_to_enemy,
+                                reward_move_to_pickup)
 
     return winRatio
 
 if __name__ == '__main__':
 
-    num_iter = 20
-    init_points = 20
+    num_iter = 15
+    init_points = 15
 
     """
     float reward_first_step_idle = 0.001f;

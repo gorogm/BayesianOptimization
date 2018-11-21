@@ -15,7 +15,10 @@ import subprocess
 import os
 def xgb_evaluate(reward_first_step_idle,
                  reward_sooner_later_ratio,
-                 reward_collectedPowerup,
+                 reward_extraBombPowerupPoints,
+                 reward_extraRangePowerupPoints,
+                 reward_otherKickPowerupPoints,
+                 reward_firstKickPowerupPoints,
                  reward_move_to_enemy,
                  reward_move_to_pickup):
 
@@ -24,7 +27,10 @@ def xgb_evaluate(reward_first_step_idle,
     file = open(paramFile, "w")
     file.write("reward_first_step_idle=" + str(reward_first_step_idle) + "\r\n")
     file.write("reward_sooner_later_ratio=" + str(reward_sooner_later_ratio) + "\r\n")
-    file.write("reward_collectedPowerup=" + str(reward_collectedPowerup) + "\r\n")
+    file.write("reward_extraBombPowerupPoints=" + str(reward_move_to_enemy) + "\r\n")
+    file.write("reward_extraRangePowerupPoints=" + str(reward_move_to_enemy) + "\r\n")
+    file.write("reward_otherKickPowerupPoints=" + str(reward_move_to_enemy) + "\r\n")
+    file.write("reward_firstKickPowerupPoints=" + str(reward_move_to_enemy) + "\r\n")
     file.write("reward_move_to_enemy=" + str(reward_move_to_enemy) + "\r\n")
     file.write("reward_move_to_pickup=" + str(reward_move_to_pickup) + "\r\n")
     file.write("silent=1" + "\r\n")
@@ -47,9 +53,13 @@ def xgb_evaluate(reward_first_step_idle,
             pass
         winRatio = xgb_evaluate(reward_first_step_idle,
                                 reward_sooner_later_ratio,
-                                reward_collectedPowerup,
+                                reward_extraBombPowerupPoints,
+                                reward_extraRangePowerupPoints,
+                                reward_otherKickPowerupPoints,
+                                reward_firstKickPowerupPoints,
                                 reward_move_to_enemy,
-                                reward_move_to_pickup)
+                                reward_move_to_pickup
+        )
 
     return winRatio
 
@@ -61,7 +71,12 @@ if __name__ == '__main__':
     """
     float reward_first_step_idle = 0.001f;
     float reward_sooner_later_ratio = 0.98f;
-    float reward_collectedPowerup = 0.5f;
+    
+    float reward_extraBombPowerupPoints = 0.6f;
+    float reward_extraRangePowerupPoints = 0.4f;
+    float reward_otherKickPowerupPoints = 0.2f;
+    float reward_firstKickPowerupPoints = 0.7f;
+    
     float reward_move_to_enemy = 100.0f;
     float reward_move_to_pickup = 1000.0f;
     """
@@ -69,7 +84,10 @@ if __name__ == '__main__':
     xgbBO = BayesianOptimization(xgb_evaluate, {
                                                 'reward_first_step_idle': (0.01, 0.0001),
                                                 'reward_sooner_later_ratio': (0.90, 0.99),
-                                                'reward_collectedPowerup': (0.3, 0.6),
+                                                'reward_extraBombPowerupPoints': (0.4, 1.0),
+                                                'reward_extraRangePowerupPoints': (0.2, 1.0),
+                                                'reward_otherKickPowerupPoints': (0.01, 1.0),
+                                                'reward_firstKickPowerupPoints': (0.2, 0.7),
                                                 'reward_move_to_enemy': (80, 130),
                                                 'reward_move_to_pickup': (800, 1300),
                                                 })
